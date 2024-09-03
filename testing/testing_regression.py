@@ -3,7 +3,7 @@ from tinygrad.tensor import Tensor, dtypes
 from tinygrad.tensor import _to_np_dtype
 import torch
 import numpy as np
-from torchmetrics.regression import MeanSquaredError
+from torchmetrics.regression import MeanSquaredError, MeanAbsoluteError, MeanSquaredLogError
 from tinymetrics.losses import regression
 import time
 
@@ -32,7 +32,7 @@ def metric_helper_test(prediction: np.ndarray, target: np.ndarray, torch_fxn, ti
             torch_output.detach().numpy(), atol, rtol)
 
 
-class MSETest(unittest.TestCase):
+class RegressionTests(unittest.TestCase):
     def test_RMSE(self):
         torch_RMSE, tiny_RMSE = MeanSquaredError(squared=False), regression.MeanSquareError(rooted=True)  # noqa 501
         pred_1d, target_1d = np.array([1, 5, 7]), np.array([2, 5, 6])
@@ -47,7 +47,7 @@ class MSETest(unittest.TestCase):
         metric_helper_test(pred_3d, target_3d, lambda x,
                            y: torch_RMSE(x, y), lambda x, y: tiny_RMSE(x, y))
 
-    def testMSE(self):
+    def test_MSE(self):
         torch_MSE, tiny_MSE = MeanSquaredError(squared=True), regression.MeanSquareError(rooted=False)  # noqa 501
         pred_1d, target_1d = np.array([1, 5, 7]), np.array([2, 5, 6])
         pred_2d, target_2d = np.array(
@@ -60,6 +60,34 @@ class MSETest(unittest.TestCase):
                            y: torch_MSE(x, y), lambda x, y: tiny_MSE(x, y))
         metric_helper_test(pred_3d, target_3d, lambda x,
                            y: torch_MSE(x, y), lambda x, y: tiny_MSE(x, y))
+
+    def test_MSLE(self):
+        torch_MSLE, tiny_MSLE = MeanSquaredLogError(), regression.MeanSquareLogError()  # noqa 501
+        pred_1d, target_1d = np.array([1, 5, 7]), np.array([2, 5, 6])
+        pred_2d, target_2d = np.array(
+            [[1, 5, 7], [1, 9, 5]]), np.array([[2, 5, 6], [1, 4, 5]])
+        pred_3d, target_3d = np.array([[[1, 5, 7], [1, 9, 5]], [[3, 5, 4], [5, 3, 6]]]), np.array(
+            [[[2, 5, 6], [1, 4, 5]], [[3, 5, 4], [5, 3, 6]]])
+        metric_helper_test(pred_1d, target_1d, lambda x,
+                           y: torch_MSLE(x, y), lambda x, y: tiny_MSLE(x, y))
+        metric_helper_test(pred_2d, target_2d, lambda x,
+                           y: torch_MSLE(x, y), lambda x, y: tiny_MSLE(x, y))
+        metric_helper_test(pred_3d, target_3d, lambda x,
+                           y: torch_MSLE(x, y), lambda x, y: tiny_MSLE(x, y))
+
+    def test_MAE(self):
+        torch_MAE, tiny_MAE = MeanAbsoluteError(), regression.MeanAbsoluteError()  # noqa 501
+        pred_1d, target_1d = np.array([1, 5, 7]), np.array([2, 5, 6])
+        pred_2d, target_2d = np.array(
+            [[1, 5, 7], [1, 9, 5]]), np.array([[2, 5, 6], [1, 4, 5]])
+        pred_3d, target_3d = np.array([[[1, 5, 7], [1, 9, 5]], [[3, 5, 4], [5, 3, 6]]]), np.array(
+            [[[2, 5, 6], [1, 4, 5]], [[3, 5, 4], [5, 3, 6]]])
+        metric_helper_test(pred_1d, target_1d, lambda x,
+                           y: torch_MAE(x, y), lambda x, y: tiny_MAE(x, y))
+        metric_helper_test(pred_2d, target_2d, lambda x,
+                           y: torch_MAE(x, y), lambda x, y: tiny_MAE(x, y))
+        metric_helper_test(pred_3d, target_3d, lambda x,
+                           y: torch_MAE(x, y), lambda x, y: tiny_MAE(x, y))
 
 
 if __name__ == "__main__":

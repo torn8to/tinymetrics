@@ -18,7 +18,7 @@ class MeanSquareLogError:
     def __call__(self, prediction: Tensor, truth: Tensor) -> Tensor:
         assert prediction.shape == truth.shape, f"ouput shape {
             prediction.shape}  and truth shape {truth.shape} not equivalent shape"
-        return prediction.log().sub(truth.log()).square().mean() if not self.rooted else prediction.log().sub(truth.log()).square().mean().sqrt()
+        return (prediction+1).log().sub((truth+1).log()).square().mean()
 
 
 class MeanAbsoluteError:
@@ -28,4 +28,4 @@ class MeanAbsoluteError:
     def __call__(self, prediction: Tensor, truth: Tensor) -> Tensor:
         assert prediction.shape == truth.shape, f"ouput shape {
             prediction.shape}  and truth shape {truth.shape} not equivalent shape"
-        return prediction.sub(truth).mean()
+        return prediction.sub(truth).abs().mean()
