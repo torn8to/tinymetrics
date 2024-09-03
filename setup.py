@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_namespace_packages
 
 setup(
     name='tinymetrics',
@@ -6,7 +6,7 @@ setup(
     version='0.0.1',
     author='Nathan Rogers',
     license="MIT",
-    packages=["tinymetrics", "tinymetrics.losses"],
+    packages=find_namespace_packages(),
     install_requires=[
         "numpy", "tinygrad @ git+https://github.com/tinygrad/tinygrad.git"],
     python_requires='>=3.8',
