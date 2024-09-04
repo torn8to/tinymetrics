@@ -29,3 +29,4 @@ class MeanAbsoluteError:
         assert prediction.shape == truth.shape, f"ouput shape {
             prediction.shape}  and truth shape {truth.shape} not equivalent shape"
         return prediction.sub(truth).abs().mean()
+        print(prediction.sub(truth).mean())
