@@ -3,7 +3,7 @@ from tinygrad.tensor import Tensor, dtypes
 import torch
 import numpy as np
 from torchmetrics import Metric
-from torchmetrics.regression import MeanSquaredError, MeanAbsoluteError, MeanSquaredLogError
+from torchmetrics.regression import MeanSquaredError, MeanAbsoluteError, MeanSquaredLogError, CosineSimilarity,
 from tinymetrics.losses import regression
 from typing import Sequence, Optional
 from testing_helpers import metric_helper
@@ -36,7 +36,21 @@ class RegressionTests(unittest.TestCase):
         metric_helper([30,30], lambda x, y: torch_MAE(x, y), lambda x, y: tiny_MAE(x, y))
         metric_helper([25,62,40], lambda x, y: torch_MAE(x, y), lambda x, y: tiny_MAE(x, y))
         metric_helper([25,62,40,20], lambda x, y: torch_MAE(x, y), lambda x, y: tiny_MAE(x, y))
+    
+    def test_CosineSimilarity(self):
+        torch_CS, tiny_CS =  CosineSimilarity(), regression.CosineSimilarity()
+        metric_helper([45], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        metric_helper([32,24], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        metric_helper([45,32,24], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        metric_helper([42,32,24,12], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
 
+    def test_MinkowskiDistance(self):
+        torch_MD, tiny_MD =  MinkowskiDistance(), regression.MinkowskiDistance()
+        metric_helper([45], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        metric_helper([32,24], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        metric_helper([45,32,24], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        metric_helper([42,32,24,12], lambda x, y: torch_CS(x, y), lambda x, y: tiny_CS(x,y))
+        
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
