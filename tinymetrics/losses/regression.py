@@ -1,5 +1,7 @@
 from tinygrad.tensor import Tensor
-from tinymetrics import Metric
+from tinymetrics.metrics import Metric
+
+
 
 class MeanSquareError(Metric):
     """
@@ -40,22 +42,23 @@ class MeanAbsoluteError(Metric):
 
 
 class CosineSimilarity(Metric):
-    def __init__(self):
-        pass
+    def __init__(self, matrix_norm=None):
+        self.matrix_norm = None
 
     def __call__(self, prediction:Tensor, truth:Tensor) -> Tensor:
         assert prediction.shape == truth.shape, f"ouput shape {prediction.shape}  and truth shape {truth.shape} not equivalent shape"
-        return prediction.matmul(truth).sum()/(truth.pow(2).sum().sqrth() * prediction.pow(2).sum().sqrt())
+        assert len(prediction.shape) ==2, f"minkowski distance does not support anything other than 2d tensors"
+        return (prediction.matmul(truth.T)).sum().div(((truth.abs().pow(2).sum().sqrt()) * (prediction.abs().pow(2).sum().sqrt())))
 
 class MinkowskiDistance(Metric):
     def __init__(self, p=2):
         self.p = p
 
     def __call__(self,prediction:Tensor, truth:Tensor, p = None) -> Tensor:
-        if if  not p == None: self.p = p
+        if not p == None: self.p = p
         assert prediction.shape == truth.shape, f"ouput shape {prediction.shape}  and truth shape {truth.shape} not equivalent shape"
-        assert not isinstance(self.p,[float,int, Tensor]) and self.p >= 1, f"p is not of type float int or tensor or > 1 the value of p is {self.p} and "
-        return prediction.sub(truth).abs().sum().pow(1/p)
+        assert isinstance(self.p,(float,int, Tensor)) and self.p >= 1, f"p is not of type float int or tensor or > 1 the value of p is {self.p} and type is {type(self.p)} "
+        return prediction.sub(truth).abs().pow(self.p).sum().pow(1/self.p)
 
 
 
